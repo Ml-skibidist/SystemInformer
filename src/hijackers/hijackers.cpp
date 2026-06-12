@@ -1,8 +1,10 @@
-/* Hijackers system information - hijackers.cpp. */
+/* hijackers.cpp - file of code hijackers. */
 
+// File code includes
 #include "hijackers.h"
-#include "../utils/convert.h"
+#include "../utils/utils.h"
 
+// Using of this file includes
 #include <TlHelp32.h>
 #include <Psapi.h>
 #include <winternl.h>
@@ -469,7 +471,7 @@ bool NtDllHijacker::QueryInformationProcessDefaultProcesses()
 		
 		// Set info
 		procInfo.id = reinterpret_cast<DWORD>(pSysProcInfo->UniqueProcessId);
-		procInfo.name = UtilsConvert::wstr_to_str(pSysProcInfo->ImageName.Buffer);
+		procInfo.name = Utils::WCharToChar(pSysProcInfo->ImageName.Buffer);
 
 		// Getting path handle
 		HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procInfo.id);
@@ -642,7 +644,7 @@ bool NtDllHijacker::QueryInformationProcessBasicProcesses()
 
 		// Set info
 		procInfo.id = reinterpret_cast<DWORD>(pSysProcInfo->UniqueProcessId);
-		procInfo.name = UtilsConvert::wstr_to_str(pSysProcInfo->ImageName.Buffer);
+		procInfo.name = Utils::WCharToChar(pSysProcInfo->ImageName.Buffer);
 
 		// Getting path handle
 		HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procInfo.id);
@@ -782,7 +784,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		PIMAGE_NT_HEADERS64 ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS64>(ntdllFileBuff.data() + dosHeader->e_lfanew);
 
 		DWORD addrExportRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress, addrExportRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress, addrExportRAW)) {
 			return false;
 		}
 		PIMAGE_EXPORT_DIRECTORY addrExportDir = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(ntdllFileBuff.data() + addrExportRAW);
@@ -791,7 +793,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		}
 
 		DWORD namesRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrExportDir->AddressOfNames, namesRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrExportDir->AddressOfNames, namesRAW)) {
 			return false;
 		}
 		DWORD* addrNamesRAW = reinterpret_cast<DWORD*>(ntdllFileBuff.data() + namesRAW);
@@ -808,7 +810,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 			}
 
 			DWORD nameRAW{};
-			if (!UtilsConvert::rva_to_raw(ntHeader, nameRVA, nameRAW)) {
+			if (!Utils::rva_to_raw(ntHeader, nameRVA, nameRAW)) {
 				continue;
 			}
 
@@ -829,7 +831,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		}
 
 		DWORD ordsRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrExportDir->AddressOfNameOrdinals, ordsRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrExportDir->AddressOfNameOrdinals, ordsRAW)) {
 			return false;
 		}
 		WORD* addrOrdsRAW = reinterpret_cast<WORD*>(ntdllFileBuff.data() + ordsRAW);
@@ -843,7 +845,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		}
 
 		DWORD funcsRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrExportDir->AddressOfFunctions, funcsRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrExportDir->AddressOfFunctions, funcsRAW)) {
 			return false;
 		}
 		DWORD* addrFuncsRAW = reinterpret_cast<DWORD*>(ntdllFileBuff.data() + funcsRAW);
@@ -856,7 +858,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 			return false;
 		}
 		DWORD addrNeedRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrNeedRVA, addrNeedRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrNeedRVA, addrNeedRAW)) {
 			return false;
 		}
 
@@ -897,7 +899,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		PIMAGE_NT_HEADERS32 ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS32>(ntdllFileBuff.data() + dosHeader->e_lfanew);
 
 		DWORD addrExportRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress, addrExportRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress, addrExportRAW)) {
 			return false;
 		}
 		PIMAGE_EXPORT_DIRECTORY addrExportDir = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(ntdllFileBuff.data() + addrExportRAW);
@@ -906,7 +908,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		}
 
 		DWORD namesRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrExportDir->AddressOfNames, namesRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrExportDir->AddressOfNames, namesRAW)) {
 			return false;
 		}
 		DWORD* addrNamesRAW = reinterpret_cast<DWORD*>(ntdllFileBuff.data() + namesRAW);
@@ -922,7 +924,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 				continue;
 			}
 			DWORD nameRAW{};
-			if (!UtilsConvert::rva_to_raw(ntHeader, nameRVA, nameRAW)) {
+			if (!Utils::rva_to_raw(ntHeader, nameRVA, nameRAW)) {
 				continue;
 			}
 
@@ -943,7 +945,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		}
 
 		DWORD ordsRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrExportDir->AddressOfNameOrdinals, ordsRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrExportDir->AddressOfNameOrdinals, ordsRAW)) {
 			return false;
 		}
 		WORD* addrOrdsRAW = reinterpret_cast<WORD*>(ntdllFileBuff.data() + ordsRAW);
@@ -957,7 +959,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 		}
 
 		DWORD funcsRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrExportDir->AddressOfFunctions, funcsRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrExportDir->AddressOfFunctions, funcsRAW)) {
 			return false;
 		}
 		DWORD* addrFuncsRAW = reinterpret_cast<DWORD*>(ntdllFileBuff.data() + funcsRAW);
@@ -970,7 +972,7 @@ bool SysCallHijacker::GetSCN(std::string ntdllFuncName, DWORD& SCN)
 			return false;
 		}
 		DWORD addrNeedRAW{};
-		if (!UtilsConvert::rva_to_raw(ntHeader, addrNeedRVA, addrNeedRAW)) {
+		if (!Utils::rva_to_raw(ntHeader, addrNeedRVA, addrNeedRAW)) {
 			return false;
 		}
 
@@ -1045,7 +1047,7 @@ bool SysCallHijacker::QueryInformationProcessDefaultProcesses()
 
 		// Set info
 		procInfo.id = reinterpret_cast<DWORD>(pSysProcInfo->UniqueProcessId);
-		procInfo.name = UtilsConvert::wstr_to_str(pSysProcInfo->ImageName.Buffer);
+		procInfo.name = Utils::WCharToChar(pSysProcInfo->ImageName.Buffer);
 
 		// Getting path handle
 		HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procInfo.id);
@@ -1201,7 +1203,7 @@ bool SysCallHijacker::QueryInformationProcessBasicProcesses()
 
 		// Set info
 		procInfo.id = reinterpret_cast<DWORD>(pSysBasicProcInfo->UniqueProcessId);
-		procInfo.name = UtilsConvert::wstr_to_str(pSysBasicProcInfo->ImageName.Buffer);
+		procInfo.name = Utils::WCharToChar(pSysBasicProcInfo->ImageName.Buffer);
 
 		// Getting path handle
 		HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procInfo.id);
@@ -1294,7 +1296,7 @@ bool SysCallHijacker::CapThreads(unsigned long procId)
 }
 
 // Manager
-void ManagerHijackers::Switch(SwitchesEnum switcher)
+void ManagerHijackers::SetHijacker(SwitchesEnum switcher)
 {
 	// Set needable datatype, default is WinAPI
 	switch (switcher) {
@@ -1303,6 +1305,9 @@ void ManagerHijackers::Switch(SwitchesEnum switcher)
 		case (SWITCH_SYSCALL): { ihijacker_ = std::make_unique<SysCallHijacker>(); break; }
 		default: { ihijacker_ = std::make_unique<WinAPIHijacker>(); }
 	}
+}
+IHijackers* ManagerHijackers::GetHijacker() {
+	return ihijacker_.get();
 }
 
 CapRetCodesEnum ManagerHijackers::Cap(unsigned char method, CapsEnum cap, unsigned long procId)
@@ -1350,8 +1355,4 @@ CapRetCodesEnum ManagerHijackers::Cap(unsigned char method, CapsEnum cap, unsign
 	}
 
 	return ret;
-}
-
-IHijackers* ManagerHijackers::GetHijacker() {
-	return ihijacker_.get();
 }

@@ -1,13 +1,14 @@
-/* Utils of src - convert.h. */
+/* utils.h - using for src and e.t.c. */
 
 #ifndef CONVERT_H
 #define CONVERT_H
 
+// Using of this file includes
 #include <wtypes.h>
 #include <string>
 
-namespace UtilsConvert {
-	// Memory converter
+namespace Utils {
+	// Memory converters
 	inline const bool rva_to_raw(const PIMAGE_NT_HEADERS32& ntHeader, unsigned long RVA, unsigned long& RAW)
 	{
 		// Check args
@@ -63,55 +64,26 @@ namespace UtilsConvert {
 		return false;
 	}
 
-	// String converter
-	inline std::string wstr_to_str(PWSTR& wstr)
-	{
-		// Check args
-		if (lstrlenW(wstr) <= 0) {
-			return std::string();
+	// String converters
+	inline std::string WCharToChar(const wchar_t* wstr) {
+		if (!wstr || lstrlenW(wstr) == 0) {
+			return "";
 		}
 
-		// Calc needed wchar size and check
-		int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
-		if (sizeNeeded <= 0) {
-			return std::string();
+		int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
+		if (size <= 0) {
+			return "";
 		}
 
-		// Convert
-		std::string strTo(sizeNeeded - 1, 0);
-		if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &strTo[0], sizeNeeded, NULL, NULL) <= 0) {
-			return std::string();
+		std::string chrStr(size - 1, 0);
+		if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &chrStr[0], size, NULL, NULL) <= 0) {
+			return "";
 		}
 
-		return strTo;
+		return chrStr;
 	}
-
-	// Cap return code converter
-	inline std::string cap_retcode_to_str(unsigned char retcode)
-	{
-		if (retcode & (1 << 6)) {
-			return "Failed CapThreads.";
-		}
-		if (retcode & (1 << 5)) {
-			return "Failed CapModules.";
-		}
-		if (retcode & (1 << 4)) {
-			return "Failed CapProcess.";
-		}
-		if (retcode & (1 << 3)) {
-			return "Failed SetMethod.";
-		}
-		if (retcode & (1 << 2)) {
-			return "Bad args.";
-		}
-		if (retcode & (1 << 1)) {
-			return "Unsupported.";
-		}
-		if (retcode & (1 << 0)) {
-			return "Successfully.";
-		}
-
-		return "None.";
+	inline std::string WCharToChar(const std::wstring& wstr) {
+		return WCharToChar(wstr.c_str());
 	}
 }
 

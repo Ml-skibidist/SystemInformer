@@ -1,8 +1,9 @@
-/* Hijackers system information - hijackers.h. */
+/* hijackers.h - WINAPI/NtDll/Syscalls. */
 
 #ifndef HIJACKERS_H
 #define HIJACKERS_H
 
+// File code includes
 #include <string>
 #include <vector>
 #include <memory>
@@ -111,6 +112,7 @@ protected:
 	unsigned char method_;
 
 public:
+	// Constructor/Destructor
 	IHijackers() = default;
 	virtual ~IHijackers() = default;
 
@@ -215,14 +217,40 @@ public:
 	explicit ManagerHijackers(std::unique_ptr<IHijackers> ihijacker) : ihijacker_(std::move(ihijacker)) {}
 	~ManagerHijackers() = default;
 
-	// Switcher
-	void Switch(SwitchesEnum switcher);
-	
+	// Getter/Setter
+	IHijackers* GetHijacker();
+	void SetHijacker(SwitchesEnum switcher);
+
 	// Capturing
 	CapRetCodesEnum Cap(unsigned char method, CapsEnum type, unsigned long procId);
-	
-	// Inside methods in hijacker
-	IHijackers* GetHijacker();
+
+	// Cap retcode converter
+	inline std::string cap_retcode_to_str(unsigned char retcode)
+	{
+		if (retcode & (1 << 6)) {
+			return "Failed CapThreads.";
+		}
+		if (retcode & (1 << 5)) {
+			return "Failed CapModules.";
+		}
+		if (retcode & (1 << 4)) {
+			return "Failed CapProcess.";
+		}
+		if (retcode & (1 << 3)) {
+			return "Failed SetMethod.";
+		}
+		if (retcode & (1 << 2)) {
+			return "Bad args.";
+		}
+		if (retcode & (1 << 1)) {
+			return "Unsupported.";
+		}
+		if (retcode & (1 << 0)) {
+			return "Successfully.";
+		}
+
+		return "None.";
+	}
 };
 
 #endif // HIJACKERS_H
