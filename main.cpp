@@ -62,7 +62,7 @@ int main()
     /* Direct SysCall */
 
     // Switch manager to SysCall
-    hijackersManager_.SetHijacker(SWITCH_NTDLL);
+    hijackersManager_.SetHijacker(SWITCH_SYSCALL);
 
     // Capture and retcode check
     capRetCode = hijackersManager_.Cap(SYSCALL_QIPD, CAP_PROCESSES, NULL);
