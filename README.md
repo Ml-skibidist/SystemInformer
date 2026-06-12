@@ -1,4 +1,4 @@
-# 🔍 **Open-Source** SystemInformer
+# 🛠 **Open-Source** SystemInformer
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue.svg)]()
 [![Status: In Development](https://img.shields.io/badge/Status-In%20Development-orange.svg)]()
